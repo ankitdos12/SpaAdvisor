@@ -135,10 +135,10 @@ const AddServicePage = () => {
     }
 
     return (
-        <div className="max-w-[70rem] mx-auto p-6">
+        <div className="w-full min-h-screen p-4 md:p-6 lg:p-8">
             {!isIdSubmitted ? (
-                <form onSubmit={handleSubmitId} className="space-y-4">
-                    <h2 className="text-2xl font-bold mb-6">Enter Spa ID</h2>
+                <form onSubmit={handleSubmitId} className="max-w-md mx-auto space-y-4">
+                    <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Enter Spa ID</h2>
                     <FormInput
                         label="Spa ID"
                         value={spaId}
@@ -148,127 +148,143 @@ const AddServicePage = () => {
                     />
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
                     >
                         Continue
                     </button>
                 </form>
             ) : (
-                <form onSubmit={handleSubmitServices} className="space-y-6">
-                    <h2 className="text-2xl font-bold mb-6">Add Services for Spa ID: {spaId}</h2>
+                <form onSubmit={handleSubmitServices} className="max-w-4xl mx-auto space-y-6">
+                    <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Add Services for Spa ID: {spaId}</h2>
                     {services.map((service, index) => (
-                        <div key={index} className="p-4 border rounded-lg space-y-4">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-semibold">Service {index + 1}</h3>
+                        <div key={index} className="p-3 md:p-4 border rounded-lg space-y-3 md:space-y-4">
+                            <div className="flex flex-wrap justify-between items-center gap-2">
+                                <h3 className="text-base md:text-lg font-semibold">Service {index + 1}</h3>
                                 {services.length > 1 && (
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveService(index)}
-                                        className="text-red-500 hover:text-red-700"
+                                        className="text-red-500 hover:text-red-700 text-sm md:text-base"
                                     >
                                         Remove
                                     </button>
                                 )}
                             </div>
-                            <FormInput
-                                label="Title"
-                                value={service.title}
-                                onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
-                                required
-                                placeholder={"e.g. Swedish Massage"}
-                            />
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormInput
+                                    label="Title"
+                                    value={service.title}
+                                    onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
+                                    required
+                                    placeholder="e.g. Swedish Massage"
+                                />
+                                <FormInput
+                                    label="Price"
+                                    type="number"
+                                    value={service.price}
+                                    onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
+                                    required
+                                    placeholder="e.g. 1000"
+                                />
+                            </div>
+
                             <FormInput
                                 label="Description"
                                 value={service.description}
                                 onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
                                 required
-                                placeholder={"e.g. A relaxing full-body massage"}
+                                placeholder="e.g. A relaxing full-body massage"
                             />
+
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">Duration Options</label>
-                                {service.duration.map((dur, durIndex) => (
-                                    <div key={durIndex} className="flex gap-2">
-                                        <FormInput
-                                            value={dur}
-                                            onChange={(e) => handleArrayChange(index, 'duration', durIndex, e.target.value)}
-                                            placeholder="e.g. 60 mins"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveArrayItem(index, 'duration', durIndex)}
-                                            className="text-red-500"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
+                                <div className="grid gap-2">
+                                    {service.duration.map((dur, durIndex) => (
+                                        <div key={durIndex} className="flex flex-wrap gap-2">
+                                            <div className="flex-grow">
+                                                <FormInput
+                                                    value={dur}
+                                                    onChange={(e) => handleArrayChange(index, 'duration', durIndex, e.target.value)}
+                                                    placeholder="e.g. 60 mins"
+                                                    required
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveArrayItem(index, 'duration', durIndex)}
+                                                className="text-red-500 px-2"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => handleAddArrayItem(index, 'duration')}
-                                    className="text-blue-500"
+                                    className="text-blue-500 text-sm"
                                 >
                                     Add Duration Option
                                 </button>
                             </div>
-                            <FormInput
-                                label="Price"
-                                type="number"
-                                value={service.price}
-                                onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
-                                required
-                                placeholder={"e.g. 1000"}
-                            />
+
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">Service Image</label>
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => handleServiceChange(index, 'image', e.target.files)}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border rounded-md text-sm"
                                     required
                                 />
                                 {service.imagePreview && (
                                     <img 
                                         src={service.imagePreview} 
                                         alt="Preview" 
-                                        className="mt-2 max-w-[200px] rounded-md"
+                                        className="mt-2 max-w-[150px] md:max-w-[200px] rounded-md"
                                     />
                                 )}
                             </div>
+
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">Details</label>
-                                {service.details.map((detail, detailIndex) => (
-                                    <div key={detailIndex} className="flex gap-2">
-                                        <FormInput
-                                            value={detail}
-                                            onChange={(e) => handleArrayChange(index, 'details', detailIndex, e.target.value)}
-                                            placeholder="Add service detail"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveArrayItem(index, 'details', detailIndex)}
-                                            className="text-red-500"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
+                                <div className="grid gap-2">
+                                    {service.details.map((detail, detailIndex) => (
+                                        <div key={detailIndex} className="flex flex-wrap gap-2">
+                                            <div className="flex-grow">
+                                                <FormInput
+                                                    value={detail}
+                                                    onChange={(e) => handleArrayChange(index, 'details', detailIndex, e.target.value)}
+                                                    placeholder="Add service detail"
+                                                    required
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveArrayItem(index, 'details', detailIndex)}
+                                                className="text-red-500 px-2"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => handleAddArrayItem(index, 'details')}
-                                    className="text-blue-500"
+                                    className="text-blue-500 text-sm"
                                 >
                                     Add Detail
                                 </button>
                             </div>
+
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">Category</label>
                                 <select
                                     value={service.category}
                                     onChange={(e) => handleServiceChange(index, 'category', e.target.value)}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border rounded-md text-sm"
                                     required
                                 >
                                     {SERVICE_CATEGORIES.map((category) => (
@@ -280,17 +296,17 @@ const AddServicePage = () => {
                             </div>
                         </div>
                     ))}
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <button
                             type="button"
                             onClick={handleAddService}
-                            className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+                            className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 text-sm md:text-base transition-colors"
                         >
                             Add Another Service
                         </button>
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 text-sm md:text-base transition-colors"
                         >
                             Submit All Services
                         </button>
@@ -298,9 +314,9 @@ const AddServicePage = () => {
                 </form>
             )}
             {isLoading && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded">
-                        Processing...
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded-lg shadow-lg">
+                        <p className="text-center">Processing...</p>
                     </div>
                 </div>
             )}

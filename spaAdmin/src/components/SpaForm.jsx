@@ -170,7 +170,7 @@ const SpaForm = () => {
             });
 
             const response = await axios.post(
-                'http://localhost:5000/api/v1/spas',
+                'https://spabackend-x1sr.onrender.com/api/v1/spas',
                 formData,
                 {
                     headers: {
@@ -196,60 +196,74 @@ const SpaForm = () => {
     };
 
     return (
-        <div className="max-w-[70rem] mx-auto p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-bold mb-6">Add New Spa</h2>
+        <div className="w-full max-w-[70rem] mx-auto p-3 sm:p-6 bg-white shadow-md rounded-lg">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Add New Spa</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <FormInput label="Spa Name" name="name" value={spa.name} onChange={handleChange} required placeholder="Enter spa name" />
-                <LocationFields location={spa.location} onChange={handleChange} />
-                <FormInput label="Spa Types (comma-separated)" name="type" value={spa.type.join(', ')} onChange={handleChange} placeholder="e.g. Ayurvedic, Thai, Swedish" />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                    <FormInput label="Spa Name" name="name" value={spa.name} onChange={handleChange} required placeholder="Enter spa name" />
+                    <LocationFields location={spa.location} onChange={handleChange} />
+                    <FormInput label="Spa Types (comma-separated)" name="type" value={spa.type.join(', ')} onChange={handleChange} placeholder="e.g. Ayurvedic, Thai, Swedish" />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormInput label="Starting Price" type="number" name="startingPrice" value={spa.startingPrice} onChange={handleChange} min="0" />
                     <FormInput label="Discount (%)" type="number" name="discount" value={spa.discount} onChange={handleChange} min="0" max="100" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormInput label="Rating" type="number" name="rating" value={spa.rating} onChange={handleChange} min="0" max="5" step="0.1" />
                     <FormInput label="Review Count" type="number" name="reviewCount" value={spa.reviewCount} onChange={handleChange} min="0" />
                 </div>
+
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Contact Information</h3>
-                    <FormInput label="Phone Number" name="contacts.number" value={spa.contacts.number} onChange={handleChange} />
-                    <FormInput label="Email" name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
-                    <FormInput label="Website" name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
+                    <h3 className="text-base sm:text-lg font-semibold">Contact Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormInput label="Phone Number" name="contacts.number" value={spa.contacts.number} onChange={handleChange} />
+                        <FormInput label="Email" name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
+                        <FormInput label="Website" name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
+                    </div>
                 </div>
+
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Opening Hours</h3>
-                    <FormInput label="Working Days" name="openingHours.days" value={spa.openingHours.days} onChange={handleChange} />
-                    <FormInput label="Timings" name="openingHours.time" value={spa.openingHours.time} onChange={handleChange} />
+                    <h3 className="text-base sm:text-lg font-semibold">Opening Hours</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormInput label="Working Days" name="openingHours.days" value={spa.openingHours.days} onChange={handleChange} />
+                        <FormInput label="Timings" name="openingHours.time" value={spa.openingHours.time} onChange={handleChange} />
+                    </div>
                 </div>
-                <h3 className="text-lg font-semibold">Coordinates</h3>
-                <div className="grid grid-cols-2 gap-4">
-                    <FormInput label="Latitude" type="number" name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
-                    <FormInput label="Longitude" type="number" name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
+
+                <div className="space-y-4">
+                    <h3 className="text-base sm:text-lg font-semibold">Coordinates</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormInput label="Latitude" type="number" name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
+                        <FormInput label="Longitude" type="number" name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
+                    </div>
                 </div>
+
                 <div className="space-y-4">
                     <label className="block font-medium text-sm text-gray-700">Upload Images ({imageFiles.length} selected)</label>
-                    <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" viewBox="0 0 20 16">
+                    <label className="flex flex-col items-center justify-center w-full h-40 sm:h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div className="flex flex-col items-center justify-center p-4 text-center">
+                            <svg className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-4 text-gray-500" fill="none" viewBox="0 0 20 16">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                             </svg>
-                            <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                             <p className="text-xs text-gray-500">PNG, JPG or JPEG (MAX. 5MB each)</p>
                         </div>
                         <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} />
                     </label>
 
                     {imagePreviews.length > 0 && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mt-4">
                             {imagePreviews.map((preview, index) => (
                                 <div key={index} className="relative group">
-                                    <img src={preview} alt={`Preview ${index + 1}`} className="h-32 w-full object-cover rounded-lg" />
+                                    <img src={preview} alt={`Preview ${index + 1}`} className="h-24 sm:h-32 w-full object-cover rounded-lg" />
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
-                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-500 text-white rounded-full p-1 opacity-70 sm:opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
@@ -258,11 +272,12 @@ const SpaForm = () => {
                         </div>
                     )}
                 </div>
+
                 <div className="mt-6">
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 transition duration-300 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                        className="w-full bg-blue-500 text-white py-2 sm:py-3 rounded-md hover:bg-blue-600 transition duration-300 disabled:bg-blue-300 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                         {isSubmitting ? 'Saving Spa...' : 'Add Spa'}
                     </button>

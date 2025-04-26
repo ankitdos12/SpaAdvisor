@@ -3,7 +3,7 @@ import SpaList from "../components/SpaList";
 
 const AdminSpaPage = () => {
     return (
-        <div className="ml-64">
+        <div >
             <SpaList />
         </div>
     );

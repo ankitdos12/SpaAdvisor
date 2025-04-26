@@ -13,14 +13,14 @@ import AdminSpaPage from './Pages/AdminSpaPage';
 import DashboardContent from './Pages/DashboardContent';
 import AddSpa from './Pages/AddSpa';
 import { ToastContainer } from 'react-toastify';
-import AddServicePage from './pages/AddServicePage';
+import AddServicePage from './Pages/AddServicePage';
 import { MdAddBusiness } from "react-icons/md";
 import BookingsContent from './Pages/BookingsContent';
 import { IoMdNotifications } from 'react-icons/io';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Sidebar Component
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, isOpen, toggleSidebar }) => {
   const menuItems = [
     { icon: AiFillHome, label: 'Dashboard', tab: 'dashboard' },
     { icon: FaSpa, label: 'Add Spa', tab: 'spa' },
@@ -31,31 +31,51 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 overflow-y-auto">
-      <div className="p-6 text-2xl font-bold border-b border-gray-700">
-        Admin Panel
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={toggleSidebar}
+        ></div>
+      )}
+      <div className={`
+        fixed left-0 top-0 h-screen bg-gray-900 text-white z-30
+        transform transition-transform duration-300 ease-in-out
+        lg:transform-none lg:w-64
+        ${isOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full'}
+      `}>
+        <div className="p-6 text-2xl font-bold border-b border-gray-700 flex justify-between items-center">
+          <span>Admin Panel</span>
+          <button onClick={toggleSidebar} className="lg:hidden">✕</button>
+        </div>
+        <nav className="mt-10">
+          {menuItems.map((item) => (
+            <button
+              key={item.tab}
+              onClick={() => setActiveTab(item.tab)}
+              className={`w-full flex items-center p-4 hover:bg-gray-800 transition-colors 
+                ${activeTab === item.tab ? 'bg-gray-800 text-blue-400' : 'text-gray-300'}`}
+            >
+              <item.icon className="mr-3 w-5 h-5" />
+              {item.label}
+            </button>
+          ))}
+        </nav>
       </div>
-      <nav className="mt-10">
-        {menuItems.map((item) => (
-          <button
-            key={item.tab}
-            onClick={() => setActiveTab(item.tab)}
-            className={`w-full flex items-center p-4 hover:bg-gray-800 transition-colors 
-              ${activeTab === item.tab ? 'bg-gray-800 text-blue-400' : 'text-gray-300'}`}
-          >
-            <item.icon className="mr-3 w-5 h-5" />
-            {item.label}
-          </button>
-        ))}
-      </nav>
-    </div>
+    </>
   );
 };
 
 // NotificationSidebar Component
 const NotificationSidebar = ({ notifications, isOpen, onClose }) => {
   return (
-    <div className={`fixed right-0 top-0 h-screen w-80 bg-white shadow-lg transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+    <div className={`
+      fixed right-0 top-0 h-screen bg-white shadow-lg z-40
+      transform transition-transform duration-300
+      w-full sm:w-80
+      ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+    `}>
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl font-semibold">Notifications</h2>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -78,15 +98,21 @@ const NotificationSidebar = ({ notifications, isOpen, onClose }) => {
 };
 
 // Header Component
-const Header = ({ activeTab, notifications, toggleNotifications }) => {
+const Header = ({ activeTab, notifications, toggleNotifications, toggleSidebar }) => {
   return (
-    <header className="ml-64 bg-white shadow-md p-4 flex justify-between items-center">
-      <h1 className="text-2xl font-semibold capitalize">{activeTab}</h1>
+    <header className="bg-white shadow-md p-4 flex justify-between items-center
+      lg:ml-64 transition-all duration-300">
       <div className="flex items-center">
         <button 
-          className="mr-4 relative"
-          onClick={toggleNotifications}
+          className="lg:hidden mr-4 text-gray-600"
+          onClick={toggleSidebar}
         >
+          ☰
+        </button>
+        <h1 className="text-xl sm:text-2xl font-semibold capitalize">{activeTab}</h1>
+      </div>
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        <button className="relative" onClick={toggleNotifications}>
           <IoMdNotifications className="w-6 h-6 text-gray-600" />
           {notifications.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
@@ -94,16 +120,17 @@ const Header = ({ activeTab, notifications, toggleNotifications }) => {
             </span>
           )}
         </button>
-        <div className="mr-4 flex items-center">
+        <div className="hidden sm:flex items-center">
           <img
             src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg"
             alt="Admin"
-            className="w-10 h-10 rounded-full mr-2"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2"
           />
-          <span className="font-medium">Admin User</span>
+          <span className="font-medium">Admin</span>
         </div>
-        <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center">
-          <AiOutlineLogout className="mr-2 w-4 h-4" /> Logout
+        <button className="bg-red-500 text-white px-2 py-1 sm:px-4 sm:py-2 rounded hover:bg-red-600 flex items-center">
+          <AiOutlineLogout className="w-4 h-4" />
+          <span className="hidden sm:inline ml-2">Logout</span>
         </button>
       </div>
     </header>
@@ -167,10 +194,10 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [notifications, setNotifications] = useState([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const toggleNotifications = () => {
-    setIsNotificationOpen(!isNotificationOpen);
-  };
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleNotifications = () => setIsNotificationOpen(!isNotificationOpen);
 
   // Function to add new notification
   const addNotification = (message) => {
@@ -201,16 +228,22 @@ const App = () => {
   };
 
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex bg-gray-100 w-full min-h-screen">
       <ToastContainer position="top-right" autoClose={3000} />
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="ml-5 flex-1">
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+      />
+      <div className="flex-1 transition-all duration-300">
         <Header 
           activeTab={activeTab} 
           notifications={notifications}
           toggleNotifications={toggleNotifications}
+          toggleSidebar={toggleSidebar}
         />
-        <main className="p-6">
+        <main className="p-3 sm:p-6 lg:ml-64">
           {renderContent()}
         </main>
       </div>
