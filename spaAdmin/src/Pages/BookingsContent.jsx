@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getBooking, deleteBooking } from '../api/spaApi';
+import { getToken } from "../utils/token";
 
 const MAX_RETRIES = 13;
 
@@ -101,7 +102,9 @@ const BookingsContent = () => {
     );
 
     return (
-        <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
+      <>{
+        getToken() ? (
+            <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
             <ToastContainer position="top-right" autoClose={3000} />
             <div className="max-w-full mx-auto bg-white shadow-md rounded-lg overflow-hidden my-4">
                 {loading ? (
@@ -161,6 +164,13 @@ const BookingsContent = () => {
                 )}
             </div>
         </div>
+        ):(
+            <div className="flex flex-col items-center justify-center bg-gray-100">
+                <h1 className="text-2xl font-bold mb-4">Unauthorized Access</h1>
+                <p className="text-gray-600">Please log in to view this page.</p>
+            </div>
+        )
+      }</>
     );
 };
 

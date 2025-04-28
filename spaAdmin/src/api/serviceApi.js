@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://spabackend-x1sr.onrender.com/api/v1";
 
-export const addService = async (spaId, service) => {
+export const addService = async (spaId, service, token) => {
   const formData = new FormData();
 
   Object.entries(service).forEach(([key, value]) => {
@@ -17,7 +17,10 @@ export const addService = async (spaId, service) => {
     `${API_BASE_URL}/spas/${spaId}/services`,
     formData,
     {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      },
     }
   );
 

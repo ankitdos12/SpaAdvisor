@@ -1,8 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import FormInput from './form/FormInput';
 import LocationFields from './form/LocationFields';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+
+const API_URL = import.meta.env.VITE_API_URL
 
 const initialState = {
     name: '',
@@ -28,7 +31,8 @@ const initialState = {
     openingHours: {
         days: 'Monday to Sunday',
         time: '10:00 AM to 10:00 PM'
-    }
+    },
+    mapLink: ''
 };
 
 const SpaForm = () => {
@@ -39,6 +43,20 @@ const SpaForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Special handling for mobile number to ensure only digits and max 10 characters
+        if (name === 'contacts.number') {
+            const numericValue = value.replace(/\D/g, '').slice(0, 10);
+            setSpa(prev => ({
+                ...prev,
+                contacts: {
+                    ...prev.contacts,
+                    number: numericValue
+                }
+            }));
+            return;
+        }
+
         if (name.startsWith('location.')) {
             setSpa(prev => ({
                 ...prev,
@@ -103,7 +121,7 @@ const SpaForm = () => {
         if (spa.contacts.email && !emailRegex.test(spa.contacts.email)) errors.push('Invalid email format');
 
         const phoneRegex = /^\d{10}$/;
-        if (spa.contacts.number && !phoneRegex.test(spa.contacts.number)) errors.push('Phone number must be 10 digits');
+        if (spa.contacts.number && !phoneRegex.test(spa.contacts.number)) errors.push('Phone number must be exactly 10 digits');
 
         if (errors.length > 0) {
             throw new Error(errors.join('\n'));
@@ -136,12 +154,20 @@ const SpaForm = () => {
             imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
         };
     }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
             validateForm();
+
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                toast.error('Please login first to add spa services');
+                setIsSubmitting(false);
+                return;
+            }
 
             const formData = new FormData();
 
@@ -164,17 +190,19 @@ const SpaForm = () => {
             formData.append('contacts[website]', spa.contacts.website.trim());
             formData.append('openingHours[days]', spa.openingHours.days);
             formData.append('openingHours[time]', spa.openingHours.time);
+            formData.append('mapLink', spa.mapLink.trim());
 
             imageFiles.forEach(file => {
                 formData.append('images', file);
             });
 
             const response = await axios.post(
-                'https://spabackend-x1sr.onrender.com/api/v1/spas',
+                `${API_URL}/spas`,
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`
                     },
                     timeout: 10000
                 }
@@ -189,8 +217,12 @@ const SpaForm = () => {
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || error.message || 'Failed to save spa.';
-            toast.error(errorMessage, { position: 'top-right', autoClose: 5000 });
-        } finally {
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please login again.');
+                // Optionally redirect to login or handle session expiry
+            } else {
+                toast.error(errorMessage, { position: 'top-right', autoClose: 5000 });
+            }
             setIsSubmitting(false);
         }
     };
@@ -218,9 +250,17 @@ const SpaForm = () => {
                 <div className="space-y-4">
                     <h3 className="text-base sm:text-lg font-semibold">Contact Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormInput label="Phone Number" name="contacts.number" value={spa.contacts.number} onChange={handleChange} />
-                        <FormInput label="Email" name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
-                        <FormInput label="Website" name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
+                        <FormInput
+                            label="Phone Number"
+                            name="contacts.number"
+                            value={spa.contacts.number}
+                            onChange={handleChange}
+                            type="tel"
+                            placeholder="Enter 10-digit mobile number"
+                            maxLength="10"
+                        />
+                        <FormInput label="Email" placeholder={"spa@gmail.com"} name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
+                        <FormInput label="Website" placeholder={"https://spaadvisor.in/"} name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
                     </div>
                 </div>
 
@@ -235,9 +275,16 @@ const SpaForm = () => {
                 <div className="space-y-4">
                     <h3 className="text-base sm:text-lg font-semibold">Coordinates</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormInput label="Latitude" type="number" name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
-                        <FormInput label="Longitude" type="number" name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
+                        <FormInput label="Latitude" type="number" placeholder={"19.056732"} name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
+                        <FormInput label="Longitude" type="number" placeholder={"73.003881"} name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
                     </div>
+                    <FormInput
+                        label="Google Maps Link"
+                        name="mapLink"
+                        value={spa.mapLink}
+                        onChange={handleChange}
+                        placeholder="Enter Google Maps URL"
+                    />
                 </div>
 
                 <div className="space-y-4">

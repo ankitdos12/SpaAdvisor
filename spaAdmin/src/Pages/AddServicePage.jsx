@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { SERVICE_CATEGORIES } from '../types/service';
 import { addService } from '../api/serviceApi';
 import { validateService } from '../utils/validation';
+import { getToken } from '../utils/token';
 import FormInput from '../components/form/FormInput';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddServicePage = () => {
     const [spaId, setSpaId] = useState('');
@@ -81,14 +84,21 @@ const AddServicePage = () => {
         setIsLoading(true);
         setError('');
         
+        const token = getToken();
+        if (!token) {
+            toast.error('Authentication required. Please login.');
+            setIsLoading(false);
+            return;
+        }
+        
         try {
             // Validate all services
             services.forEach((service, index) => validateService(service, index));
 
             // Submit services sequentially
-            await Promise.all(services.map(service => addService(spaId, service)));
+            await Promise.all(services.map(service => addService(spaId, service, token)));
             
-            alert('Services added successfully!');
+            toast.success('Services added successfully!');
             setServices([{
                 title: '',
                 description: '',
@@ -101,6 +111,7 @@ const AddServicePage = () => {
             setIsIdSubmitted(false);
 
         } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
             setError(error.response?.data?.message || error.message);
         } finally {
             setIsLoading(false);
@@ -136,6 +147,7 @@ const AddServicePage = () => {
 
     return (
         <div className="w-full min-h-screen p-4 md:p-6 lg:p-8">
+            <ToastContainer position="top-right" autoClose={3000} />
             {!isIdSubmitted ? (
                 <form onSubmit={handleSubmitId} className="max-w-md mx-auto space-y-4">
                     <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Enter Spa ID</h2>
