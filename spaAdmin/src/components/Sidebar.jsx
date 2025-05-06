@@ -6,8 +6,7 @@ import {
 } from 'react-icons/ai';
 import { BiSpa } from 'react-icons/bi';
 import { FaSpa } from "react-icons/fa6";
-
-import { MdAddBusiness } from "react-icons/md";
+import { MdAddBusiness, MdEmail } from "react-icons/md";
  
 const Sidebar = ({ activeTab, setActiveTab, isOpen, toggleSidebar }) => {
     const menuItems = [
@@ -16,7 +15,9 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen, toggleSidebar }) => {
         { icon: BiSpa, label: 'All Spa', tab: 'allspa' },
         { icon: AiOutlineCalendar, label: 'Bookings', tab: 'bookings' },
         { icon: AiOutlineUser, label: 'Users', tab: 'users' },
-        { icon: MdAddBusiness, label: 'Add Spa Service', tab: 'settings' }
+        { icon: MdAddBusiness, label: 'Add Spa Service', tab: 'settings' },
+        { icon: AiOutlineUser, label: 'Update Services', tab: 'service' },
+        { icon: MdEmail, label: 'Inquiries', tab: 'inquiries' },
     ];
 
     return (

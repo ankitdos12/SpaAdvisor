@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const DashboardContent = () => {
+const SpaDetailsPage = () => {
     const [spaDetailsList, setSpaDetailsList] = useState([]); // Initialize as empty array
     const [formData, setFormData] = useState(initialFormData());
     const [isEditing, setIsEditing] = useState(false);
@@ -218,4 +218,4 @@ const DashboardContent = () => {
     );
 };
 
-export default DashboardContent;
+export default SpaDetailsPage;

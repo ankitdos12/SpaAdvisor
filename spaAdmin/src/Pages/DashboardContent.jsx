@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { AiOutlineUser, AiOutlineShop, AiOutlineLogin, AiOutlinePlus, AiOutlineUnorderedList } from 'react-icons/ai';
+import { AiOutlineUser, AiOutlineShop, AiOutlineLogin, AiOutlineUnorderedList } from 'react-icons/ai';
 import { Link, Navigate } from 'react-router-dom';
-import { getSpas, getTotalLogedInUsers, getAllUsers } from '../api/spaApi';
+import { getUserStats, getSpas } from '../api/spaApi';
 import { getToken } from '../utils/token';
 
 const DashboardContent = () => {
@@ -10,31 +10,30 @@ const DashboardContent = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [spasRes, loginRes, usersRes] = await Promise.all([
-                    getSpas(),
-                    getTotalLogedInUsers(),
-                    getAllUsers()
+                const [usersResponse, spasResponse] = await Promise.all([
+                    getUserStats(getToken()),
+                    getSpas(getToken())
                 ]);
 
-                console.log("loginRes", loginRes);
-
+                const usersRes = usersResponse.data || [];
+                const spasRes = spasResponse || [];
 
                 setStats([
                     {
                         label: 'Total Users',
-                        value: usersRes.totalUsers || '0',
+                        value: usersRes.totalRegularUsers || '0',
                         icon: AiOutlineUser,
                         colorClasses: 'border-blue-500 bg-blue-100 text-blue-500'
                     },
                     {
                         label: 'Logged In Users',
-                        value: loginRes.totalCurrentlyLoggedIn || '0',
+                        value: usersRes.currentlyLoggedInUsers || '0',
                         icon: AiOutlineLogin,
                         colorClasses: 'border-green-500 bg-green-100 text-green-500'
                     },
                     {
                         label: 'Total Spas',
-                        value: spasRes?.length?.toString() || '0',
+                        value: spasRes.length.toString() || '0',
                         icon: AiOutlineShop,
                         colorClasses: 'border-red-500 bg-red-100 text-red-500'
                     }
@@ -47,12 +46,6 @@ const DashboardContent = () => {
     }, []);
 
     const navigationCards = [
-        {
-            label: 'Add Spa Details',
-            icon: AiOutlinePlus,
-            path: '/add-spa-details',
-            colorClasses: 'border-purple-500 bg-purple-100 text-purple-500'
-        },
         {
             label: 'View Spas Details',
             icon: AiOutlineUnorderedList,

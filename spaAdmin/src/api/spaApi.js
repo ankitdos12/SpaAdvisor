@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { getToken } from '../utils/token';
 
-const API_URL = import.meta.env.VITE_API_URL || "https://spabackend-x1sr.onrender.com/api/v1";
-
-// const API_URL = "http://localhost:5000/api/v1";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Get all spas
 export const getSpas = async () => {
@@ -11,23 +10,24 @@ export const getSpas = async () => {
     const response = await axios.get(`${API_URL}/spas`, config);
     return response.data.data;
 };
+
 // Update spa
-export const updateSpa = async (id, spaData) => {
+export const updateSpa = async (id, formData) => {
     try {
-        const token = localStorage.getItem('adminToken');
-        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.put(`${API_URL}/spas/${id}`, spaData, config);
+        const response = await fetch(`${API_URL}/spas/${id}`, {
+            method: 'PUT',
+            body: formData,
+            credentials: 'include'
+        });
 
-        if (response.status !== 200 && response.status !== 204) {
-            throw new Error('Failed to update spa');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to update spa');
         }
 
-        return true;
+        return await response.json();
     } catch (error) {
-        if (error.response) {
-            throw new Error(error.response.data.message || 'Failed to update spa');
-        }
-        throw new Error(error.message || 'Failed to update spa');
+        throw error;
     }
 };
 
@@ -61,10 +61,18 @@ export const deleteSpa = async (spaId) => {
 
 // Get getBooking
 export const getBooking = async () => {
-    const token = localStorage.getItem('adminToken');
-    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    const response = await axios.get(`${API_URL}/bookings`, config);
-    return response.data;
+    try {
+        const response = await axios.get('http://localhost:5000/api/v1/bookings', {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        throw error;
+    }
 };
 
 // Delete Booking
@@ -88,20 +96,66 @@ export const deleteBooking = async (id) => {
 };
 
 // Get all users
-export const getUsers = async () => {
-    const response = await axios.get(`${API_URL}/users`);
+export const getUsers = async (token) => {
+    const response = await axios.get(`${API_URL}/auth/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
 };
 
+// Delete user
+export const deleteUser = async (id, token) => {
+    try {
+        const response = await axios.delete(`${API_URL}/auth/deleteUser/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.status !== 200 && response.status !== 204) {
+            throw new Error('Failed to delete user');
+        }
+
+        return true;
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data.message || 'Failed to delete user');
+        }
+        throw new Error(error.message || 'Failed to delete user');
+    }
+};
 // Get total users
-export const getAllUsers = async () => {
-    const response = await axios.get(`${API_URL}/users/total-signups`);
+export const getUserStats = async (token) => {
+    const response = await axios.get(`${API_URL}/auth/admin/users/stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
 };
 
 // get total logedIn users
 export const getTotalLogedInUsers = async () => {
     const response = await axios.get(`${API_URL}/users/total-logged-in`);
+    return response.data;
+};
+
+// Get inquiry
+export const getInquiry = async (token) => {
+    const response = await axios.get(`${API_URL}/inquirySpa`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+    return response.data;
+};
+
+// Get user profile
+export const getUserProfile = async (token) => {
+    const response = await axios.get(`${API_URL}/auth/profile`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
     return response.data;
 };
 

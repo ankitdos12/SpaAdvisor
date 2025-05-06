@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import FormInput from './form/FormInput';
 import LocationFields from './form/LocationFields';
@@ -11,8 +10,8 @@ const initialState = {
     name: '',
     location: {
         country: 'India',
-        state: 'Maharashtra',
-        district: 'Thane',
+        state: '',
+        district: '',
         locality: '',
         pincode: '',
         address: ''
@@ -30,7 +29,7 @@ const initialState = {
     },
     openingHours: {
         days: 'Monday to Sunday',
-        time: '10:00 AM to 10:00 PM'
+        time: '10:30 AM to 10:00 PM'
     },
     mapLink: ''
 };
@@ -43,20 +42,6 @@ const SpaForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        // Special handling for mobile number to ensure only digits and max 10 characters
-        if (name === 'contacts.number') {
-            const numericValue = value.replace(/\D/g, '').slice(0, 10);
-            setSpa(prev => ({
-                ...prev,
-                contacts: {
-                    ...prev.contacts,
-                    number: numericValue
-                }
-            }));
-            return;
-        }
-
         if (name.startsWith('location.')) {
             setSpa(prev => ({
                 ...prev,
@@ -121,7 +106,7 @@ const SpaForm = () => {
         if (spa.contacts.email && !emailRegex.test(spa.contacts.email)) errors.push('Invalid email format');
 
         const phoneRegex = /^\d{10}$/;
-        if (spa.contacts.number && !phoneRegex.test(spa.contacts.number)) errors.push('Phone number must be exactly 10 digits');
+        if (spa.contacts.number && !phoneRegex.test(spa.contacts.number)) errors.push('Phone number must be 10 digits');
 
         if (errors.length > 0) {
             throw new Error(errors.join('\n'));
@@ -154,7 +139,6 @@ const SpaForm = () => {
             imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
         };
     }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -203,8 +187,7 @@ const SpaForm = () => {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`
-                    },
-                    timeout: 10000
+                    }
                 }
             );
 
@@ -250,17 +233,9 @@ const SpaForm = () => {
                 <div className="space-y-4">
                     <h3 className="text-base sm:text-lg font-semibold">Contact Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormInput
-                            label="Phone Number"
-                            name="contacts.number"
-                            value={spa.contacts.number}
-                            onChange={handleChange}
-                            type="tel"
-                            placeholder="Enter 10-digit mobile number"
-                            maxLength="10"
-                        />
-                        <FormInput label="Email" placeholder={"spa@gmail.com"} name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
-                        <FormInput label="Website" placeholder={"https://spaadvisor.in/"} name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
+                        <FormInput label="Phone Number" name="contacts.number" value={spa.contacts.number} onChange={handleChange} />
+                        <FormInput label="Email" name="contacts.email" value={spa.contacts.email} onChange={handleChange} />
+                        <FormInput label="Website" name="contacts.website" value={spa.contacts.website} onChange={handleChange} />
                     </div>
                 </div>
 
@@ -275,8 +250,8 @@ const SpaForm = () => {
                 <div className="space-y-4">
                     <h3 className="text-base sm:text-lg font-semibold">Coordinates</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormInput label="Latitude" type="number" placeholder={"19.056732"} name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
-                        <FormInput label="Longitude" type="number" placeholder={"73.003881"} name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
+                        <FormInput label="Latitude" type="number" name="coordinates.lat" value={spa.coordinates.lat || ''} onChange={handleChange} step="any" />
+                        <FormInput label="Longitude" type="number" name="coordinates.lng" value={spa.coordinates.lng || ''} onChange={handleChange} step="any" />
                     </div>
                     <FormInput
                         label="Google Maps Link"

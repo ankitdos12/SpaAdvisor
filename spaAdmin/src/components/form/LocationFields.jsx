@@ -1,57 +1,69 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FormInput from './FormInput';
-import FormTextArea from './FormTextArea';
 
-const LocationFields = ({ location, onChange }) => {
+const LocationFields = ({ location = {}, onChange }) => {
+    useEffect(() => {
+        console.log('Location data received:', location);
+    }, [location]);
+
+    const defaultLocation = {
+        country: location.country || 'India',
+        state: location.state || '',
+        district: location.district || '',
+        locality: location.locality || '',
+        pincode: location.pincode || '',
+        address: location.address || '',
+    };
+
     return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <FormInput
+                    label="Country"
+                    name="location.country"
+                    value={defaultLocation.country}
+                    onChange={onChange}
+                    disabled
+                />
+                <FormInput
+                    label="State"
+                    name="location.state"
+                    value={defaultLocation.state}
+                    onChange={onChange}
+                    disabled
+                />
+                <FormInput
+                    label="District"
+                    name="location.district"
+                    value={defaultLocation.district}
+                    onChange={onChange}
+                    disabled
+                />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormInput
+                    label="Locality"
+                    name="location.locality"
+                    value={defaultLocation.locality}
+                    onChange={onChange}
+                    required
+                />
+                <FormInput
+                    label="Pincode"
+                    name="location.pincode"
+                    value={defaultLocation.pincode}
+                    onChange={onChange}
+                    required
+                />
+            </div>
+
             <FormInput
-                label="Country"
-                name="location.country"
-                value={location.country}
-                onChange={onChange}
-                required
-                placeholder="e.g. India"
-            />
-            <FormInput
-                label="State"
-                name="location.state"
-                value={location.state}
-                onChange={onChange}
-                required
-                placeholder="e.g. Maharashtra"
-            />
-            <FormInput
-                label="District"
-                name="location.district"
-                value={location.district}
-                onChange={onChange}
-                required
-                placeholder="e.g. Thane"
-            />
-            <FormInput
-                label="Locality"
-                name="location.locality"
-                value={location.locality}
-                onChange={onChange}
-                required
-                placeholder="e.g. Hiranandani Estate"
-            />
-            <FormInput
-                label="Pincode"
-                name="location.pincode"
-                value={location.pincode}
-                onChange={onChange}
-                required
-                placeholder="e.g. 400607"
-            />
-            <FormTextArea
-                label="Address"
+                label="Full Address"
                 name="location.address"
-                value={location.address}
+                value={defaultLocation.address}
                 onChange={onChange}
                 required
-                placeholder="Enter complete address"
             />
         </div>
     );

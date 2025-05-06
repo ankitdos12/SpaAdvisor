@@ -1,6 +1,6 @@
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getToken, removeToken } from "../utils/token";
 
 const Header = ({ activeTab, notifications, toggleNotifications, toggleSidebar }) => {
@@ -37,14 +37,16 @@ const Header = ({ activeTab, notifications, toggleNotifications, toggleSidebar }
                     )}
                 </button>
                 <div className="hidden sm:flex items-center">
-                    <img
-                        src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg"
-                        alt="Admin"
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2"
-                    />
+                    <Link to={"/profile"} className="flex items-center">
+                        <img
+                            src="https://png.pngtree.com/png-clipart/20231019/original/pngtree-user-profile-avatar-png-image_13369988.png"
+                            alt="Admin"
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2"
+                        />
+                    </Link>
                     <span className="font-medium">Admin</span>
                 </div>
-                <button 
+                <button
                     onClick={handleLoginClick}
                     className="bg-red-500 text-white px-2 py-1 sm:px-4 sm:py-2 rounded hover:bg-red-600 flex items-center"
                 >

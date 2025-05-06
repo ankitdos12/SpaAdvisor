@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -7,27 +7,30 @@ const API_URL = import.meta.env.VITE_API_URL;
 const LoginPage = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
-        emailOrPhone: '',
+        loginId: '',
         password: ''
     });
 
     const [errors, setErrors] = useState({});
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
     const validateForm = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^\d{10}$/;
-        const { emailOrPhone, password } = formData;
+        const { loginId, password } = formData;
 
-        if (!emailOrPhone.trim()) {
-            newErrors.emailOrPhone = 'Email or Phone number is required';
+        if (!loginId.trim()) {
+            newErrors.loginId = 'Email or Phone number is required';
         } else {
-            const isEmail = emailOrPhone.includes('@');
-            if (isEmail && !emailRegex.test(emailOrPhone)) {
-                newErrors.emailOrPhone = 'Invalid email format';
-            } else if (!isEmail && !phoneRegex.test(emailOrPhone)) {
-                newErrors.emailOrPhone = 'Phone number must be 10 digits';
+            const isEmail = loginId.includes('@');
+            if (isEmail && !emailRegex.test(loginId)) {
+                newErrors.loginId = 'Invalid email format';
+            } else if (!isEmail && !phoneRegex.test(loginId)) {
+                newErrors.loginId = 'Phone number must be 10 digits';
             }
         }
 
@@ -64,12 +67,12 @@ const LoginPage = () => {
         setIsLoading(true);
         try {
             const loginData = {
-                emailOrPhone: formData.emailOrPhone.trim(),
+                loginId: formData.loginId.trim(),
                 password: formData.password
             };
 
             const response = await axios.post(
-                `${API_URL}/admin/login`,
+                `${API_URL}/auth/login`,
                 loginData,
                 {
                     headers: {
@@ -78,15 +81,16 @@ const LoginPage = () => {
                 }
             );
 
-            if (response.data?.token) {
-                localStorage.setItem('adminToken', response.data.token);
-                if (response.data.admin) {
-                    localStorage.setItem('adminData', JSON.stringify(response.data.admin));
-                }
-                navigate('/');
-            } else {
-                throw new Error('Invalid response from server');
+            const { token, data } = response.data;
+
+            // Validate user role
+            if (!['admin', 'superadmin'].includes(data.user.role)) {
+                throw new Error('Unauthorized access. Admin privileges required.');
             }
+
+            localStorage.setItem('adminToken', token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            navigate('/');
 
         } catch (error) {
             const errorMessage = error.response?.data?.message
@@ -110,30 +114,30 @@ const LoginPage = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                     <div>
-                        <label htmlFor="emailOrPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-1">
                             Email or Phone Number
                         </label>
                         <input
                             type="text"
-                            id="emailOrPhone"
-                            name="emailOrPhone"
-                            value={formData.emailOrPhone}
+                            id="loginId"
+                            name="loginId"
+                            value={formData.loginId}
                             onChange={handleChange}
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
-                            ${errors.emailOrPhone ? 'border-red-500' : 'border-gray-300'}`}
+                            ${errors.loginId ? 'border-red-500' : 'border-gray-300'}`}
                             placeholder="Enter email or phone number"
                         />
-                        {errors.emailOrPhone && (
-                            <p className="text-red-500 text-xs mt-1">{errors.emailOrPhone}</p>
+                        {errors.loginId && (
+                            <p className="text-red-500 text-xs mt-1">{errors.loginId}</p>
                         )}
                     </div>
 
-                    <div>
+                    <div className="relative">
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                             Password
                         </label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             id="password"
                             name="password"
                             value={formData.password}
@@ -142,6 +146,13 @@ const LoginPage = () => {
                             ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
                             placeholder="Enter your password"
                         />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-8 text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? '👁️' : '👁️‍🗨️'}
+                        </button>
                         {errors.password && (
                             <p className="text-red-500 text-xs mt-1">{errors.password}</p>
                         )}
@@ -184,14 +195,14 @@ const LoginPage = () => {
                     </div>
                 </form>
 
-                <div className="text-center">
+                {/* <div className="text-center">
                     <p className="text-sm text-gray-600">
                         Don't have an account? {' '}
                         <Link to="/signup" className="text-blue-500 hover:underline">
                             Sign up
                         </Link>
                     </p>
-                </div>
+                </div> */}
             </div>
         </div>
     );

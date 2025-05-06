@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import AddSpaDetails from './Pages/AddSpaDetails';
-import GetSpaDetails from './Pages/GetSpaDetails';
+import SpaDetailsPage from './Pages/SpaDetailsPage';
 import AdminSpaPage from './Pages/AdminSpaPage';
 import DashboardContent from './Pages/DashboardContent';
 import AddSpa from './Pages/AddSpa';
@@ -15,6 +14,10 @@ import NotificationSidebar from './components/NotificationSidebar';
 import Sidebar from './components/Sidebar';
 import LoginPage from './components/admin/LoginPage';
 import SignUpPage from './components/admin/SignUpPage';
+import UpdateServicesPage from './Pages/UpdateServicesPage';
+import SpaEdit from './components/SpaEdit';
+import InquiryContent from './Pages/InquiryContent';
+import UserProfile from './Pages/UserProfile';
 
 // Main App Component
 const App = () => {
@@ -47,8 +50,12 @@ const App = () => {
         return <AddSpa />;
       case 'settings':
         return <AddServicePage />;
+      case 'service':
+        return <UpdateServicesPage />;
       case 'bookings':
         return <BookingsContent addNotification={addNotification} />;
+      case 'inquiries':
+        return <InquiryContent />;
       default:
         return <DashboardContent />;
     }
@@ -86,11 +93,12 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/admin-signup" element={<SignUpPage />} />
         <Route path="/" element={<MainLayout />} />
         <Route path="/" element={<navigate to="/dashboard" replace />} />
-        <Route path="/add-spa-details" element={<AddSpaDetails />} />
-        <Route path="/get-spas-details" element={<GetSpaDetails />} />
+        <Route path="/get-spas-details" element={<SpaDetailsPage />} />
+        <Route path="/spas/edit/:id" element={<SpaEdit />} />
       </Routes>
     </BrowserRouter>
   );
